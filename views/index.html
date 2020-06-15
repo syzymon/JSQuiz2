@@ -1,26 +1,7 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JavaScript Quiz</title>
-    <link rel="stylesheet" href="stylesheets/main.css">
-    <link href='https://fonts.googleapis.com/css?family=Orbitron'
-          rel='stylesheet' type='text/css'>
-</head>
-<body>
-<div class="container">
-    <header>
-        <div class="js-logo">
-            <img src="images/javascript-1.svg" alt="js-logo"/>
-        </div>
-        <div class="pagetitle">
-            <h1>JavaScript Quiz</h1>
-        </div>
-        <div class="cheems-wrapper">
-            <img src="images/Cheemsburbger.png" alt="cheems"/>
-        </div>
-    </header>
+{% extends "layout.html" %}
+
+{% block content %}
+    {{ super() }}
     <div class="intro">
         <p><a href="https://pl.wikipedia.org/wiki/JavaScript">JavaScript</a>
             jest obiektowym skryptowym językiem programowania.
@@ -138,13 +119,4 @@
             </button>
         </div>
     </main>
-
-    <footer>
-        <a href="https://dev.to/damxipo/javascript-versus-memes-explaining-various-funny-memes-2o8c">
-            JavaScript memes
-        </a>
-    </footer>
-</div>
-<script src="http://localhost:8080/build/bundle.js"></script>
-</body>
-</html>
+{% endblock %}
