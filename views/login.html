@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <form action="/login" method="post">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <label>
+            <input name="login" placeholder="Nazwa użytkownika" required>
+        </label>
+        <label>
+            <input type="password" name="pass" placeholder="Hasło" required>
+        </label>
+        <input type="submit" value="Zaloguj">
+    </form>
+{% endblock %}

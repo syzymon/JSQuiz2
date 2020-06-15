@@ -2,12 +2,15 @@ import createError, {HttpError} from 'http-errors';
 import express, {Request, Response} from 'express';
 import {join} from 'path';
 import cookieParser from 'cookie-parser';
+import {store} from './session_store';
 import logger from 'morgan';
 import nunjucks from 'nunjucks';
 import {router as indexRouter} from './routes';
+import session from 'express-session';
+import passport from 'passport';
+import csurf from 'csurf';
 
 const app = express();
-
 // view engine setup
 app.set('views', join(__dirname, 'views'));
 app.set('view engine', 'html');
@@ -20,6 +23,18 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use(csurf({cookie: true}));
+app.use(
+  session({
+    secret: 'super secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {maxAge: 15 * 60 * 1000},
+    store: store,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(join(__dirname, '/../public')));
 
 app.use('/', indexRouter);

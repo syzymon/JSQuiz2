@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+// eslint-disable-next-line node/no-unpublished-require
+const {db, DB_PATH} = require('../build/db');
+// eslint-disable-next-line node/no-unpublished-require
+const {Hasher} = require('../build/hasher');
+// eslint-disable-next-line node/no-unsupported-features/node-builtins
+const fsPromises = require('fs').promises;
+const NO_USERS = 2;
+
+void (async function () {
+  await fsPromises.rmdir(DB_PATH, {recursive: true});
+  const hasher = new Hasher();
+  const hashedUsers = await Promise.all(
+    Array.from(Array(NO_USERS).keys()).map(async x => {
+      const username = `user${x + 1}`;
+      return {
+        username: username,
+        passHash: await hasher.generateHash(username),
+      };
+    })
+  );
+  await db.users.insert(hashedUsers);
+  // {
+  //   login: 'user1',
+  //   pass: await hasher.generateHash('user1'),
+  // },
+  // {
+  //   login: 'user2',
+  //   pass: await hasher.generateHash('user2'),
+  // },
+})();
