@@ -1,0 +1,8 @@
+{
+  "extends": "./node_modules/gts/",
+  "env": {
+    "node": true,
+    "es6": true,
+    "browser": true
+  }
+}
