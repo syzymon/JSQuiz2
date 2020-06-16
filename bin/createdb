@@ -5,6 +5,7 @@ const {db, DB_PATH} = require('../build/db');
 const {Hasher} = require('../build/hasher');
 // eslint-disable-next-line node/no-unsupported-features/node-builtins
 const fsPromises = require('fs').promises;
+const {join} = require('path');
 const NO_USERS = 2;
 
 void (async function () {
@@ -20,12 +21,9 @@ void (async function () {
     })
   );
   await db.users.insert(hashedUsers);
-  // {
-  //   login: 'user1',
-  //   pass: await hasher.generateHash('user1'),
-  // },
-  // {
-  //   login: 'user2',
-  //   pass: await hasher.generateHash('user2'),
-  // },
+  const quizzesData = await fsPromises.readFile(
+    join(__dirname, '/../quizzes.json')
+  );
+  const quizzes = JSON.parse(quizzesData);
+  await db.quizzes.insert(quizzes);
 })();

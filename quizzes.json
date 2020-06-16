@@ -1,0 +1,104 @@
+[
+  {
+    "id": 1,
+    "name": "JavaScript - test wiedzy",
+    "questions": [
+      {
+        "id": 1,
+        "statement": "(!+[]+[]+![]).length",
+        "answer": 9,
+        "secondsPenalty": 10
+      },
+      {
+        "id": 2,
+        "statement": "\"2\"+\"2\"-\"2\"",
+        "answer": 20,
+        "secondsPenalty": 7
+      },
+      {
+        "id": 3,
+        "statement": "11-\"1\"",
+        "answer": 10,
+        "secondsPenalty": 4
+      },
+      {
+        "id": 4,
+        "statement": "{}+[]",
+        "answer": 0,
+        "secondsPenalty": 5
+      },
+      {
+        "id": 5,
+        "statement": "[2,10,13,7].sort()[0]",
+        "answer": 10,
+        "secondsPenalty": 8
+      },
+      {
+        "id": 6,
+        "statement": "(Math.min() > Math.max()) + true",
+        "answer": 2,
+        "secondsPenalty": 5
+      },
+      {
+        "id": 7,
+        "statement": "([]+{}).length",
+        "answer": 15,
+        "secondsPenalty": 13
+      },
+      {
+        "id": 8,
+        "statement": "\"222\" - -\"111\"",
+        "answer": 333,
+        "secondsPenalty": 6
+      },
+      {
+        "id": 9,
+        "statement": "parseInt(1 / 1999999)",
+        "answer": 5,
+        "secondsPenalty": 10
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "JavaScript - historia",
+    "questions": [
+      {
+        "id": 1,
+        "statement": "W którym roku powstał JS?",
+        "answer": 1995,
+        "secondsPenalty": 9
+      },
+      {
+        "id": 2,
+        "statement": "Obslugę JSON i strict mode wprowadzono w roku:",
+        "answer": 2009,
+        "secondsPenalty": 4
+      },
+      {
+        "id": 3,
+        "statement": "Rok wprowadzenia ES6 to:",
+        "answer": 2015,
+        "secondsPenalty": 10
+      },
+      {
+        "id": 4,
+        "statement": "Async/await wprowadzono w roku:",
+        "answer": 2017,
+        "secondsPenalty": 7
+      },
+      {
+        "id": 5,
+        "statement": "Pierwsza specyfikacja Promise pochodzi z roku:",
+        "answer": 2012,
+        "secondsPenalty": 5
+      },
+      {
+        "id": 6,
+        "statement": "Które miejsce zajmuje JS w rankingu popularności języków?",
+        "answer": 2,
+        "secondsPenalty": 4
+      }
+    ]
+  }
+]

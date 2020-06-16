@@ -14,6 +14,7 @@ export const db = {
 };
 
 export interface Question {
+  readonly id: number;
   readonly statement: string;
   readonly answer: number;
   readonly secondsPenalty: number;
@@ -21,5 +22,6 @@ export interface Question {
 
 export interface Quiz {
   readonly id: number;
+  readonly name: string;
   readonly questions: Question[];
 }
