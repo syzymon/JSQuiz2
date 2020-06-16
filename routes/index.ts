@@ -3,6 +3,7 @@ import passport from 'passport';
 import {Strategy as LocalStrategy} from 'passport-local';
 import {db, User} from '../db';
 import {Hasher} from '../hasher';
+import createHttpError from 'http-errors';
 
 export const router = express.Router();
 const hasher = new Hasher();
@@ -65,4 +66,16 @@ router.post(
 router.get('/logout', requireAuth, (req, res) => {
   req.logout();
   return res.redirect('/');
+});
+
+router.get('/quiz/:id', requireAuth, async (req, res, next) => {
+  const quizId = Number(req.params.id);
+  // TODO: check if done previously by req.user
+  let quiz;
+  try {
+    quiz = await db.quizzes.findOne({id: quizId});
+  } catch (err) {
+    return next(createHttpError(404, err));
+  }
+  return res.render('quiz', {quiz: quiz});
 });
