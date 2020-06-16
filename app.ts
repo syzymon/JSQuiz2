@@ -2,7 +2,7 @@ import createError, {HttpError} from 'http-errors';
 import express, {Request, Response} from 'express';
 import {join} from 'path';
 import cookieParser from 'cookie-parser';
-import {store} from './session_store';
+import {store} from './src/session_store';
 import logger from 'morgan';
 import nunjucks from 'nunjucks';
 import {router as indexRouter} from './routes';

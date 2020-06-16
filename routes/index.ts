@@ -1,9 +1,10 @@
 import express, {NextFunction, Request, Response} from 'express';
 import passport from 'passport';
 import {Strategy as LocalStrategy} from 'passport-local';
-import {db, User} from '../db';
-import {Hasher} from '../hasher';
-import createHttpError from 'http-errors';
+import {db, Quiz, QuizResults, User} from '../src/db';
+import {Hasher} from '../src/hasher';
+import {Evaluation, Evaluator} from '../src/quiz_checker';
+import createError from 'http-errors';
 
 export const router = express.Router();
 const hasher = new Hasher();
@@ -72,18 +73,92 @@ router.get('/logout', requireAuth, (req, res) => {
 router.get('/quiz', requireAuth, async (req, res, next) => {
   const quizId = Number(req.query.id);
   // TODO: check if done previously by req.user
-  let quiz;
+  let quiz: Quiz;
   try {
-    quiz = await db.quizzes.findOne({id: quizId});
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    quiz = await db.quizzes.findOne({id: quizId}, {_id: 0});
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    const done = await db.results.count({userId: req!.user!._id});
+    if (done) return next(createError(403, 'Quiz already done'));
   } catch (err) {
-    return next(createHttpError(404, err));
+    return next(createError(404, err));
   }
+  req!.session!.startedAt = Date.now();
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  quiz.questions.forEach(question => delete question.answer);
   return res.render('quiz', {quiz: quiz, csrfToken: req.csrfToken()});
 });
 
+async function quizAverageTimes(quiz: Quiz): Promise<Map<number, number>> {
+  const quizResults = await db.results.find({quizId: quiz.id}, {answers: 1});
+  return new Map(
+    quiz.questions.map(question => {
+      const timeSum = quizResults.reduce((sum, currentValue) => {
+        const getQuestionTime = (doc: QuizResults) =>
+          doc.answers.filter(ans => ans.question.id === question.id)[0]
+            .timeSpent as number;
+        return sum + getQuestionTime((currentValue as unknown) as QuizResults);
+      }, 0);
+      return [question.id, timeSum / quiz.questions.length];
+    })
+  );
+}
+
+async function getTopScores(quiz: Quiz) {
+  return db.results.find({quizId: quiz.id}).sort({timeMs: 1}).limit(5);
+}
+
 router.post('/quiz/:id', requireAuth, async (req, res, next) => {
   const quizId = Number(req.params.id);
-  console.log(quizId, req.body.results);
-  // TODO: quiz checking, redirect to stats
-  return res.redirect('/stats');
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  const userId = req!.user!._id as string;
+  const startedAt = req.session!.startedAt as number;
+  if (!startedAt)
+    return next(createError(403, 'No information about quiz start'));
+  const alreadyExists = await db.results.count({
+    userId: userId,
+    quizId: quizId,
+  });
+  if (alreadyExists) return next(createError(403, 'Quiz already done'));
+  const quizTimeScore = Date.now() - startedAt;
+
+  const quiz = (await db.quizzes.findOne({id: quizId})) as Quiz;
+  const results = {
+    quizId: quizId,
+    userId: userId,
+    answers: JSON.parse(req.body.results),
+    timeMs: quizTimeScore,
+  } as QuizResults;
+  const evaluator = new Evaluator(quiz, results);
+  results.timeMs += evaluator.penalty * 1000; // seconds to ms
+
+  await db.results.insert(results);
+  const avgTimes = await quizAverageTimes(quiz);
+  const topResults = ((await getTopScores(quiz)) as unknown) as QuizResults[];
+  const evaluation = evaluator.getCompleteEvaluation(avgTimes, topResults);
+  return res.render('stats', {stats: [evaluation]});
+});
+
+router.get('/stats', requireAuth, async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  const r = (await db.results.find({userId: req!.user!._id})) as QuizResults[];
+  const evaluations = (await Promise.all(
+    r.map(async result => {
+      const quiz = (await db.quizzes.findOne({
+        id: result.quizId,
+      })) as Quiz;
+      const avgTimes = await quizAverageTimes(quiz);
+      const topResults = ((await getTopScores(
+        quiz
+      )) as unknown) as QuizResults[];
+      const evaluator = new Evaluator(quiz, result);
+      return evaluator.getCompleteEvaluation(avgTimes, topResults);
+    })
+  )) as Evaluation[];
+  return res.render('stats', {stats: evaluations});
 });

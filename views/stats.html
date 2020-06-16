@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    {{ super() }}
+
+    <div class="intro">
+        <p>
+            Quiz składa się z kilku pytań (co najmniej 4)
+            dotyczących
+            wartości różnych wyrażeń w tym języku. Odpowiedzi na pytania są <b>wyłącznie
+            liczbami całkowitymi.</b> Zakończenie quizu jest możliwe tylko
+            po
+            udzieleniu
+            odpowiedzi na <b>wszystkie pytania</b>. Na wynik quizu składa
+            się
+            czas wypełnienia quizu (od momentu rozpoczęcia do zakończenia)
+            oraz
+            suma karnych sekund z wszystkich pytań, na które udzielono
+            niepoprawnej
+            odpowiedzi.
+        </p>
+    </div>
+    <main>
+        {% for quizEvaluation in stats %}
+            <div class="summary">
+                <hr class="quiz-breaker">
+                <h1>{{ quizEvaluation.presentation.quizName }}</h1>
+                <div class="best-scores">
+                    <h3>Top 5</h3>
+                    <ol class="results-list">
+                        {% for topResult in quizEvaluation.topResults %}
+                            <li>{{ ((topResult.timeMs) / 1000) | round(2) }} s</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+
+                <h3>Poprawnych odpowiedzi: <span data-bind="correct">
+                    {{ quizEvaluation.presentation.correct }}</span> z
+                    <span data-bind="nQuestions">
+                    {{ quizEvaluation.presentation.nQuestions }}</span></h3>
+                <h3>Czas wykonania quizu: <span data-bind="time">
+                    {{ quizEvaluation.presentation.time }}</span> s
+                </h3>
+                <h3>Kara za błędne odpowiedzi: <span
+                        data-bind="penalty">
+                    {{ quizEvaluation.presentation.penalty }}</span> s
+                </h3>
+                <h2>Sumaryczny wynik czasowy: <span
+                        data-bind="result">
+                    {{ quizEvaluation.presentation.result }}
+                </span>
+                    s</h2>
+                {% if quizEvaluation.feedback | length %}
+                    <h1>Informacja zwrotna</h1>
+                    <ul class="feedback">
+                        {% for answer in quizEvaluation.feedback|sort(attribute='questionNr') %}
+                            <li>Pytanie nr {{ answer.questionNr }}:
+                                <code class="expr">{{ answer.statement }}</code>
+                                Twoja odpowiedź:
+                                <code class="incorrect-ans">{{ answer.usersAnswer }}</code>
+                                , powinno być:
+                                <code class="should-be">{{ answer.shouldBe }}</code>
+                                <p>
+                                    <span>Średni czas: {{ (answer.avgTime / 1000) | round(2) }} s,</span>
+                                    <span>Twój czas: {{ (answer.timeSpent / 1000) | round(2) }} s</span>
+                                </p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <h2>Czasy spędzone nad zadaniami (kolejno): <span
+                        data-bind="timeStats">
+                    {{ quizEvaluation.presentation.timeStats }}
+                </span></h2>
+
+
+            </div>
+        {% endfor %}
+        <a href="/" style="text-decoration: none"><button type="button" class="start-btn"><= Powrót do strony
+            głównej
+        </button></a>
+    </main>
+{% endblock %}
