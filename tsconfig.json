@@ -18,7 +18,8 @@
     }
   },
   "include": [
-    "*.ts",
+    "app.ts",
+    "src/*.ts",
     "routes/*.ts"
   ]
 }
