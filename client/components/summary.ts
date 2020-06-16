@@ -168,3 +168,16 @@ export class Summary extends Slide {
     this._onClose();
   }
 }
+
+export class FormSummary {
+  private _form: HTMLFormElement;
+
+  constructor() {
+    this._form = document.getElementById('finish-form') as HTMLFormElement;
+  }
+
+  public saveAndSend(res: QuizResults) {
+    this._form.results.value = JSON.stringify(res);
+    this._form.submit();
+  }
+}

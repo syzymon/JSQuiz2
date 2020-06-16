@@ -1,13 +1,13 @@
 import {Quiz, QuestionResult} from './components/quiz';
 import {Intro} from './components/intro';
-import {Summary} from './components/summary';
+import {FormSummary} from './components/summary';
 import {Slide} from './components/slide';
 
 export class App {
   private _currentComponent: Slide;
   private readonly _intro: Intro;
   private _quiz: Quiz;
-  private readonly _summary: Summary;
+  private readonly _summary: FormSummary;
 
   constructor() {
     this._quiz = new Quiz(
@@ -18,10 +18,7 @@ export class App {
       this.switchComponent(this._quiz);
       this._quiz.start();
     });
-    // this._summary = new Summary(() => {
-    //   this._intro.updateRanking();
-    //   this.switchComponent(this._intro);
-    // });
+    this._summary = new FormSummary();
     this._currentComponent = this._quiz;
     this._quiz.start();
   }
@@ -32,9 +29,7 @@ export class App {
   }
 
   private onQuizFinish(results: QuestionResult[]): void {
-    this.initializeNewQuiz();
-    this._summary.present(results);
-    this.switchComponent(this._summary);
+    this._summary.saveAndSend(results);
   }
 
   private initializeNewQuiz() {

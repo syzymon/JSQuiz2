@@ -83,6 +83,7 @@ router.get('/quiz', requireAuth, async (req, res, next) => {
 
 router.post('/quiz/:id', requireAuth, async (req, res, next) => {
   const quizId = Number(req.params.id);
+  console.log(quizId, req.body.results);
   // TODO: quiz checking, redirect to stats
   return res.redirect('/stats');
 });

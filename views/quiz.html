@@ -83,6 +83,12 @@
             </div>
         </div>
 
+        <form id="finish-form" action="/quiz/{{ quiz.id }}" method="post" hidden>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+{#            <input type="hidden" name="token" value="{{ timeToken }}">#}
+            <input type="hidden" name="results">
+        </form>
+
 {#        <div class="summary" hidden>#}
 {#            <hr class="quiz-breaker">#}
 {#            <h1>Niezła próba!</h1>#}
