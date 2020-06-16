@@ -26,7 +26,12 @@
         <ul>
             <li><a href="#">Quizy</a></li>
             <li><a href="#">Staty</a></li>
-            <li class="right-menu"><a href="/login">Zaloguj</a></li>
+            {% if not user %}
+                <li class="right-menu"><a href="/login">Zaloguj</a></li>
+            {% else %}
+                <li class="right-menu"><a href="/logout">Wyloguj</a></li>
+                <li class="right-menu"><a href="/change_pass">Zmień hasło</a></li>
+            {% endif %}
         </ul>
     </div>
 

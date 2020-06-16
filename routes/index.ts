@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {NextFunction, Request, Response} from 'express';
 import passport from 'passport';
 import {Strategy as LocalStrategy} from 'passport-local';
 import {db, User} from '../db';
@@ -31,11 +31,20 @@ passport.use(
     }
   )
 );
-
 passport.serializeUser((user: {_id: string}, done) => done(null, user._id));
 passport.deserializeUser(async (id, done) =>
   done(null, await db.users.findOne({_id: id}))
 );
+// Global user proxy for templates
+router.use((req, res, next) => {
+  res.locals.user = req.user ? req.user : null;
+  next();
+});
+// Authentication middleware for protected routes.
+function requireAuth(req: Request, res: Response, next: NextFunction) {
+  return req.isAuthenticated() ? next() : res.redirect('/login');
+}
+
 /* GET home page. */
 router.get('/', (req, res) => {
   return res.render('index');
@@ -52,3 +61,8 @@ router.post(
     return res.redirect('/');
   }
 );
+
+router.get('/logout', requireAuth, (req, res) => {
+  req.logout();
+  return res.redirect('/');
+});
