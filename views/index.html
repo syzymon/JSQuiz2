@@ -2,6 +2,7 @@
 
 {% block content %}
     {{ super() }}
+
     <div class="intro">
         <p><a href="https://pl.wikipedia.org/wiki/JavaScript">JavaScript</a>
             jest obiektowym skryptowym językiem programowania.
@@ -15,18 +16,22 @@
             Przygotowaliśmy <b>prosty quiz</b>, którego celem jest sprawdzenie
             znajomości tego języka.
         </p>
-        <p>
-            Quiz składa się z kilku pytań (co najmniej 4)
-            dotyczących
-            wartości różnych wyrażeń w tym języku. Odpowiedzi na pytania są <b>wyłącznie
-            liczbami całkowitymi.</b> Zakończenie quizu jest możliwe tylko po
-            udzieleniu
-            odpowiedzi na <b>wszystkie pytania</b>. Na wynik quizu składa się
-            czas wypełnienia quizu (od momentu rozpoczęcia do zakończenia) oraz
-            suma karnych sekund z wszystkich pytań, na które udzielono
-            niepoprawnej
-            odpowiedzi.
-        </p>
     </div>
 
+    <main>
+        <form action="/quiz" method="get">
+            <section>
+                <label>
+                    Wybierz quiz:
+                    <select name="id" required>
+                        <option value="1">Quiz 1</option>
+                        <option value="2">Quiz 2</option>
+                    </select>
+                </label>
+            </section>
+            <button type="submit" class="start-btn">=> Przejdź do
+                quizu!
+            </button>
+        </form>
+    </main>
 {% endblock %}

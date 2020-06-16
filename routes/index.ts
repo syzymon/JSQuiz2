@@ -41,6 +41,7 @@ router.use((req, res, next) => {
   res.locals.user = req.user ? req.user : null;
   next();
 });
+
 // Authentication middleware for protected routes.
 function requireAuth(req: Request, res: Response, next: NextFunction) {
   return req.isAuthenticated() ? next() : res.redirect('/login');
@@ -68,8 +69,8 @@ router.get('/logout', requireAuth, (req, res) => {
   return res.redirect('/');
 });
 
-router.get('/quiz/:id', requireAuth, async (req, res, next) => {
-  const quizId = Number(req.params.id);
+router.get('/quiz', requireAuth, async (req, res, next) => {
+  const quizId = Number(req.query.id);
   // TODO: check if done previously by req.user
   let quiz;
   try {
@@ -77,5 +78,11 @@ router.get('/quiz/:id', requireAuth, async (req, res, next) => {
   } catch (err) {
     return next(createHttpError(404, err));
   }
-  return res.render('quiz', {quiz: quiz});
+  return res.render('quiz', {quiz: quiz, csrfToken: req.csrfToken()});
+});
+
+router.post('/quiz/:id', requireAuth, async (req, res, next) => {
+  const quizId = Number(req.params.id);
+  // TODO: quiz checking, redirect to stats
+  return res.redirect('/stats');
 });

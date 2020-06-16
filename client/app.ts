@@ -18,11 +18,12 @@ export class App {
       this.switchComponent(this._quiz);
       this._quiz.start();
     });
-    this._summary = new Summary(() => {
-      this._intro.updateRanking();
-      this.switchComponent(this._intro);
-    });
-    this._currentComponent = this._intro;
+    // this._summary = new Summary(() => {
+    //   this._intro.updateRanking();
+    //   this.switchComponent(this._intro);
+    // });
+    this._currentComponent = this._quiz;
+    this._quiz.start();
   }
 
   private onQuizSkip(): void {
