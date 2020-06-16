@@ -1,7 +1,6 @@
 export interface Question {
   readonly id: number;
   readonly statement: string;
-  readonly answer: number;
   readonly secondsPenalty: number;
 }
 
