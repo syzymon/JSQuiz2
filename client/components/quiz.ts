@@ -1,4 +1,4 @@
-import {Question, shuffle, questions as que} from '../data/questions';
+import {Question, shuffle, quiz} from '../data/questions';
 import {Observable, Computed} from '../core/observable';
 import {Slide} from './slide';
 import {ContextTimer} from './timer';
@@ -145,7 +145,7 @@ export class Quiz extends Slide {
   constructor(
     onSkip: () => void,
     onFinish: (res: QuizResults) => void,
-    questions: Question[] = que
+    questions: Question[] = quiz.questions
   ) {
     super(document.querySelector('.quiz') as HTMLDivElement);
     this._questions = shuffle(questions);
@@ -173,7 +173,6 @@ export class Quiz extends Slide {
   }
 
   public start(): void {
-    console.log('quiz start');
     this._timer.start();
     this._answerView.focus();
   }

@@ -7,7 +7,10 @@ module.exports = {
       {
         test: /\.tsx?$/,
         use: 'ts-loader',
-        include: [path.resolve(__dirname, 'client')],
+        include: [
+          path.resolve(__dirname, 'client'),
+          path.resolve(__dirname, 'client/data'),
+        ],
       },
     ],
   },
@@ -16,6 +19,6 @@ module.exports = {
   },
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'build'),
+    path: path.resolve(__dirname, 'public', 'javascripts'),
   },
 };
