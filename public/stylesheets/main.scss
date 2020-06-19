@@ -222,6 +222,33 @@ main {
   }
 }
 
+#quiz-choice {
+  margin-bottom: 21px;
+
+  label {
+    color: $js-yellow;
+    font-size: 3.5vw;
+    font-family: $title-font;
+    font-weight: bold;
+  }
+
+  select {
+    font-size: 2vw;
+    height: 3.5vw;
+  }
+}
+
+.info {
+  font-size: 2vw;
+  font-family: $title-font;
+  font-weight: bold;
+  color: $red-yellow;
+
+  a {
+    text-decoration: none;
+    color: $js-yellow;
+  }
+}
 
 .meme {
   grid-area: meme;
