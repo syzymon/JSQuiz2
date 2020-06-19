@@ -4,6 +4,9 @@
     {{ super() }}
 
     <div class="intro">
+        {% if user %}
+            <p>Witaj, {{ user.username }}.</p>
+        {% endif %}
         <p><a href="https://pl.wikipedia.org/wiki/JavaScript">JavaScript</a>
             jest obiektowym skryptowym językiem programowania.
             Stworzony
@@ -19,19 +22,27 @@
     </div>
 
     <main>
+        {% if quizzes %}
         <form action="/quiz" method="get">
-            <section>
+            <section id="quiz-choice">
                 <label>
-                    Wybierz quiz:
+                    Wybierz spośród dostępnych quizów:
                     <select name="id" required>
-                        <option value="1">Quiz 1</option>
-                        <option value="2">Quiz 2</option>
+                        {% for quiz in quizzes %}
+                            <option value="{{ quiz.id }}" {% if quiz.done %}disabled{% endif %}>{{ quiz.name }}</option>
+                        {% endfor %}
                     </select>
                 </label>
             </section>
-            <button type="submit" class="start-btn">=> Przejdź do
-                quizu!
+            <button type="submit" class="start-btn">=> Rozpocznij quiz!
             </button>
         </form>
+        {% else  %}
+            <p class="info">Aby rozwiązywać quizy, musisz się najpierw <a href="/login">zalogować</a>.</p>
+        {% endif %}
+        <div class="meme">
+            <img src="/images/3fa.jpg" alt="meme"/>
+            <span class="caption">Backemd demveloper</span>
+        </div>
     </main>
 {% endblock %}
