@@ -8,7 +8,6 @@ interface QuizResultsPresentation {
   time: string;
   penalty: number;
   result: string;
-  timeStats: string;
 }
 
 interface QuizResultsEvaluation {
@@ -40,8 +39,9 @@ export class Evaluator {
   private readonly _correctAnswers: number;
   private readonly _totalTimeMs: number;
   private readonly _answersMap: Map<number, number>;
+  private readonly _timeScoreMs: number;
 
-  constructor(quiz: Quiz, results: QuizResults) {
+  constructor(quiz: Quiz, results: QuizResults, addPenalty: boolean) {
     this._quiz = quiz;
     this._results = results;
     this._nQuestions = results.answers.length;
@@ -54,8 +54,8 @@ export class Evaluator {
         a + Number(b.usersAnswer === this._answersMap.get(b.question.id)),
       0
     );
-    // this._totalTimeMs = results.answers.reduce((a, b) => a + b.timeSpent, 0);
-    this._totalTimeMs = results.timeMs;
+    this._totalTimeMs = results.answers.reduce((a, b) => a + b.timeSpent, 0);
+    this._timeScoreMs = results.timeMs + (addPenalty ? this.penalty * 1000 : 0);
   }
 
   get penalty(): number {
@@ -77,16 +77,13 @@ export class Evaluator {
       correct: this._correctAnswers,
       time: msToSecondsStr(this._totalTimeMs),
       penalty: penalty,
-      result: msToSecondsStr(this._totalTimeMs + penalty * 1000),
-      timeStats: this._results.answers
-        .map(x => msToSecondsStr(x.timeSpent))
-        .join(', '),
+      result: msToSecondsStr(this._timeScoreMs),
     };
   }
 
   get resultsEvaluation(): QuizResultsEvaluation {
     return {
-      totalTimeMs: this._totalTimeMs + this.penalty * 1000,
+      totalTimeMs: this._timeScoreMs,
       userResults: this._results,
     };
   }
