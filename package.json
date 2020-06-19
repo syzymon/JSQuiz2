@@ -42,11 +42,16 @@
     "csurf": "^1.11.0",
     "ts-loader": "^7.0.5",
     "webpack": "^4.43.0",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3.11.0",
+    "mocha": "^8.0.1",
+    "chai": "^4.2.0",
+    "mocha-webdriver": "^0.2.8",
+    "selenium-webdriver": "^4.0.0-alpha.7"
   },
   "devDependencies": {
     "@types/node": "^13.11.1",
     "gts": "^2.0.2",
+    "nedb-shell": "^1.1.5",
     "typescript": "^3.8.3",
     "webpack-cli": "^3.3.11"
   }
