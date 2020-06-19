@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JavaScript Quiz</title>
+    <title>{% block title %}JavaScript Quiz{% endblock %}</title>
     <link rel="stylesheet" href="/stylesheets/main.css">
     <link href='https://fonts.googleapis.com/css?family=Orbitron'
           rel='stylesheet' type='text/css'>
@@ -30,7 +30,7 @@
                 <li class="right-menu"><a href="/login">Zaloguj</a></li>
             {% else %}
                 <li class="right-menu"><a href="/logout">Wyloguj</a></li>
-                <li class="right-menu"><a href="/change_pass">Zmień hasło</a></li>
+                <li class="right-menu"><a href="/pass">Zmień hasło</a></li>
             {% endif %}
         </ul>
     </div>

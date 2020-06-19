@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
 
+{% block title %} Statystyki {% endblock %}
+
 {% block content %}
     {{ super() }}
 
@@ -29,7 +31,8 @@
                     <h3>Top 5</h3>
                     <ol class="results-list">
                         {% for topResult in quizEvaluation.topResults %}
-                            <li>{{ ((topResult.timeMs) / 1000) | round(2) }} s</li>
+                            <li>{{ ((topResult.timeMs) / 1000) | round(2) }} s
+                            </li>
                         {% endfor %}
                     </ol>
                 </div>
@@ -56,10 +59,15 @@
                         {% for answer in quizEvaluation.feedback|sort(attribute='questionNr') %}
                             <li>Pytanie nr {{ answer.questionNr }}:
                                 <code class="expr">{{ answer.statement }}</code>
-                                Twoja odpowiedź:
-                                <code class="incorrect-ans">{{ answer.usersAnswer }}</code>
-                                , powinno być:
-                                <code class="should-be">{{ answer.shouldBe }}</code>
+                                {% if answer.usersAnswer != answer.shouldBe %}
+                                    Twoja odpowiedź:
+                                    <code class="incorrect-ans">{{ answer.usersAnswer }}</code>
+                                    , powinno być:
+                                    <code class="should-be">{{ answer.shouldBe }}</code>
+                                {% else %}
+                                    Twoja poprawna odpowiedź:
+                                    <code class="should-be">{{ answer.usersAnswer }}</code>
+                                {% endif %}
                                 <p>
                                     <span>Średni czas: {{ (answer.avgTime / 1000) | round(2) }} s,</span>
                                     <span>Twój czas: {{ (answer.timeSpent / 1000) | round(2) }} s</span>
@@ -68,16 +76,12 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
-                <h2>Czasy spędzone nad zadaniami (kolejno): <span
-                        data-bind="timeStats">
-                    {{ quizEvaluation.presentation.timeStats }}
-                </span></h2>
-
-
             </div>
         {% endfor %}
-        <a href="/" style="text-decoration: none"><button type="button" class="start-btn"><= Powrót do strony
-            głównej
-        </button></a>
+        <a href="/" style="text-decoration: none">
+            <button type="button" class="start-btn"><= Powrót do strony
+                głównej
+            </button>
+        </a>
     </main>
 {% endblock %}
