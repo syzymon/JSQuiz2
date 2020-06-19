@@ -4,6 +4,7 @@ import {join} from 'path';
 export const DB_PATH = join(__dirname, '/../../db');
 
 export interface User {
+  _id: string;
   username: string;
   passHash: string;
 }
