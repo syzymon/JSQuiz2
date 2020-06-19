@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %} Zmień hasło {% endblock %}
+
+{% block content %}
+    <form action="/pass" method="post">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <label>
+            <input type="password" name="oldPass" placeholder="Stare hasło" required>
+        </label>
+        <label>
+            <input type="password" name="newPass" placeholder="Nowe hasło" required>
+        </label>
+        <input type="submit" value="Zmień hasło">
+    </form>
+{% endblock %}
