@@ -48,13 +48,38 @@ function requireAuth(req: Request, res: Response, next: NextFunction) {
   return req.isAuthenticated() ? next() : res.redirect('/login');
 }
 
+interface QuizWithActivity extends Quiz {
+  done: boolean;
+}
 /* GET home page. */
-router.get('/', (req, res) => {
-  return res.render('index');
+router.get('/', async (req, res) => {
+  if (req.isUnauthenticated()) return res.render('index');
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  const userId = (req!.user as User)._id as string;
+  const quizzes = (await db.quizzes.find({})) as Quiz[];
+  const activeQuizzes = await Promise.all(
+    quizzes.map(async quiz => {
+      const quizWithActivity = quiz as QuizWithActivity;
+      quizWithActivity.done =
+        (await db.results.count({userId: userId, quizId: quiz.id})) > 0;
+      return quizWithActivity;
+    })
+  );
+  return res.render('index', {quizzes: activeQuizzes});
 });
 
 router.get('/login', (req, res) => {
   return res.render('login', {csrfToken: req.csrfToken()});
+});
+
+router.get('/pass', requireAuth, (req, res) => {
+  return res.render('pass', {csrfToken: req.csrfToken()});
+});
+
+router.get('/logout', requireAuth, (req, res) => {
+  req.logout();
+  return res.redirect('/');
 });
 
 router.post(
@@ -65,27 +90,53 @@ router.post(
   }
 );
 
-router.get('/logout', requireAuth, (req, res) => {
-  req.logout();
-  return res.redirect('/');
+router.post('/pass', requireAuth, async (req, res, next) => {
+  const user = req!.user as User;
+  const userId = user._id as string,
+    passHash = user.passHash;
+
+  const oldPass = req.body.oldPass as string;
+  const newPass = req.body.newPass as string;
+  // Check if old password correct.
+  if (!(await hasher.comparePass(oldPass, passHash)))
+    return res.redirect('/pass');
+  const hashedNewPass = await hasher.generateHash(newPass);
+
+  // Remove all sessions related to the current user.
+  req!.session!.destroy(async err => {
+    if (err) return next(createError(503, err));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    const store = req!.sessionStore;
+    await store.datastore.remove(
+      {'session.passport.user': userId},
+      {multi: true}
+    );
+    await db.users.update({_id: userId}, {$set: {passHash: hashedNewPass}});
+    return res.redirect('/');
+  });
 });
 
 router.get('/quiz', requireAuth, async (req, res, next) => {
   const quizId = Number(req.query.id);
-  // TODO: check if done previously by req.user
   let quiz: Quiz;
   try {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    quiz = await db.quizzes.findOne({id: quizId}, {_id: 0});
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    const done = await db.results.count({userId: req!.user!._id});
-    if (done) return next(createError(403, 'Quiz already done'));
+    quiz = ((await db.quizzes.findOne(
+      {id: quizId},
+      {_id: 0}
+    )) as unknown) as Quiz;
+
+    const alreadyDone =
+      (await db.results.count({
+        userId: (req!.user as User)._id,
+        quizId: quiz.id,
+      })) > 0;
+    if (alreadyDone) return next(createError(403, 'Quiz already done'));
   } catch (err) {
     return next(createError(404, err));
   }
   req!.session!.startedAt = Date.now();
+  // Delete answers from questions
   // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
   // @ts-ignore
   quiz.questions.forEach(question => delete question.answer);
@@ -102,7 +153,7 @@ async function quizAverageTimes(quiz: Quiz): Promise<Map<number, number>> {
             .timeSpent as number;
         return sum + getQuestionTime((currentValue as unknown) as QuizResults);
       }, 0);
-      return [question.id, timeSum / quiz.questions.length];
+      return [question.id, timeSum / quizResults.length];
     })
   );
 }
@@ -113,9 +164,8 @@ async function getTopScores(quiz: Quiz) {
 
 router.post('/quiz/:id', requireAuth, async (req, res, next) => {
   const quizId = Number(req.params.id);
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-  // @ts-ignore
-  const userId = req!.user!._id as string;
+
+  const userId = (req!.user as User)._id as string;
   const startedAt = req.session!.startedAt as number;
   if (!startedAt)
     return next(createError(403, 'No information about quiz start'));
@@ -133,7 +183,7 @@ router.post('/quiz/:id', requireAuth, async (req, res, next) => {
     answers: JSON.parse(req.body.results),
     timeMs: quizTimeScore,
   } as QuizResults;
-  const evaluator = new Evaluator(quiz, results);
+  const evaluator = new Evaluator(quiz, results, true);
   results.timeMs += evaluator.penalty * 1000; // seconds to ms
 
   await db.results.insert(results);
@@ -144,9 +194,9 @@ router.post('/quiz/:id', requireAuth, async (req, res, next) => {
 });
 
 router.get('/stats', requireAuth, async (req, res) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-  // @ts-ignore
-  const r = (await db.results.find({userId: req!.user!._id})) as QuizResults[];
+  const r = (await db.results.find({
+    userId: (req!.user as User)._id,
+  })) as QuizResults[];
   const evaluations = (await Promise.all(
     r.map(async result => {
       const quiz = (await db.quizzes.findOne({
@@ -156,7 +206,7 @@ router.get('/stats', requireAuth, async (req, res) => {
       const topResults = ((await getTopScores(
         quiz
       )) as unknown) as QuizResults[];
-      const evaluator = new Evaluator(quiz, result);
+      const evaluator = new Evaluator(quiz, result, false);
       return evaluator.getCompleteEvaluation(avgTimes, topResults);
     })
   )) as Evaluation[];
