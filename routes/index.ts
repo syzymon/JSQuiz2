@@ -54,8 +54,6 @@ interface QuizWithActivity extends Quiz {
 /* GET home page. */
 router.get('/', async (req, res) => {
   if (req.isUnauthenticated()) return res.render('index');
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-  // @ts-ignore
   const userId = (req!.user as User)._id as string;
   const quizzes = (await db.quizzes.find({})) as Quiz[];
   const activeQuizzes = await Promise.all(
@@ -137,8 +135,6 @@ router.get('/quiz', requireAuth, async (req, res, next) => {
   }
   req!.session!.startedAt = Date.now();
   // Delete answers from questions
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-  // @ts-ignore
   quiz.questions.forEach(question => delete question.answer);
   return res.render('quiz', {quiz: quiz, csrfToken: req.csrfToken()});
 });
