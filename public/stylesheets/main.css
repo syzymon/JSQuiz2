@@ -184,6 +184,31 @@ main {
   width: 60px;
 }
 
+#quiz-choice {
+  margin-bottom: 21px;
+}
+#quiz-choice label {
+  color: #f0db4f;
+  font-size: 3.5vw;
+  font-family: Impact, Helvetica, sans-serif;
+  font-weight: bold;
+}
+#quiz-choice select {
+  font-size: 2vw;
+  height: 3.5vw;
+}
+
+.info {
+  font-size: 2vw;
+  font-family: Impact, Helvetica, sans-serif;
+  font-weight: bold;
+  color: #fb3c16;
+}
+.info a {
+  text-decoration: none;
+  color: #f0db4f;
+}
+
 .meme {
   grid-area: meme;
 }
