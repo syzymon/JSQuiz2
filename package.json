@@ -3,17 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
+    "compile": "tsc && webpack",
+    "build": "npm run compile",
     "createdb": "node ./bin/createdb",
+    "start": "node ./bin/www",
+    "test": "npm run createdb && mocha --exit ./test/test.js && npm run createdb",
     "check": "gts check",
     "clean": "gts clean",
-    "compile": "tsc",
-    "build": "npm run compile && npm start",
-    "fix": "gts fix",
-    "prepare": "npm run compile",
-    "pretest": "npm run compile",
-    "posttest": "npm run check",
-    "webdev": "webpack-dev-server --mode development"
+    "fix": "gts fix"
   },
   "dependencies": {
     "@types/cookie-parser": "^1.4.2",
@@ -42,7 +39,6 @@
     "csurf": "^1.11.0",
     "ts-loader": "^7.0.5",
     "webpack": "^4.43.0",
-    "webpack-dev-server": "^3.11.0",
     "mocha": "^8.0.1",
     "chai": "^4.2.0",
     "mocha-webdriver": "^0.2.8",
